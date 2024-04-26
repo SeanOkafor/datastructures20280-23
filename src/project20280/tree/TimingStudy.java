@@ -25,8 +25,8 @@ public class TimingStudy {
             avlTree.put(num, num);
         }
         long endTimeAVLInsert = System.nanoTime();
-        long durationAVLInsert = endTimeAVLInsert - startTimeAVLInsert;
-        System.out.println("Time taken to insert random numbers into AVL tree: " + durationAVLInsert + " nanoseconds");
+        long durationAVLInsert = (endTimeAVLInsert - startTimeAVLInsert) / 1000000; // Convert nanoseconds to milliseconds
+        System.out.println("Time taken to insert random numbers into AVL tree: " + durationAVLInsert + " milliseconds");
 
         // Insert random numbers into Splay tree and measure time
         long startTimeSplayInsert = System.nanoTime();
@@ -34,8 +34,8 @@ public class TimingStudy {
             splayTree.put(num, num);
         }
         long endTimeSplayInsert = System.nanoTime();
-        long durationSplayInsert = endTimeSplayInsert - startTimeSplayInsert;
-        System.out.println("Time taken to insert random numbers into Splay tree: " + durationSplayInsert + " nanoseconds");
+        long durationSplayInsert = (endTimeSplayInsert - startTimeSplayInsert) / 1000000; // Convert nanoseconds to milliseconds
+        System.out.println("Time taken to insert random numbers into Splay tree: " + durationSplayInsert + " milliseconds");
 
         // Perform insertions and deletions on trees of size N and measure time
         int N = 100; // Adjust the size as needed
@@ -44,27 +44,27 @@ public class TimingStudy {
             long startTimeAVLInsertion = System.nanoTime();
             // Insertion operation on AVL tree
             long endTimeAVLInsertion = System.nanoTime();
-            long durationAVLInsertion = endTimeAVLInsertion - startTimeAVLInsertion;
-            System.out.println("Time taken for AVL insertion operation " + i + ": " + durationAVLInsertion + " nanoseconds");
+            long durationAVLInsertion = (endTimeAVLInsertion - startTimeAVLInsertion) / 1000000; // Convert nanoseconds to milliseconds
+            System.out.println("Time taken for AVL insertion operation " + i + ": " + durationAVLInsertion + " milliseconds");
 
             long startTimeAVLDeletion = System.nanoTime();
             // Deletion operation on AVL tree
             long endTimeAVLDeletion = System.nanoTime();
-            long durationAVLDeletion = endTimeAVLDeletion - startTimeAVLDeletion;
-            System.out.println("Time taken for AVL deletion operation " + i + ": " + durationAVLDeletion + " nanoseconds");
+            long durationAVLDeletion = (endTimeAVLDeletion - startTimeAVLDeletion) / 1000000; // Convert nanoseconds to milliseconds
+            System.out.println("Time taken for AVL deletion operation " + i + ": " + durationAVLDeletion + " milliseconds");
 
             // Perform insertions and deletions on Splay tree
             long startTimeSplayInsertion = System.nanoTime();
             // Insertion operation on Splay tree
             long endTimeSplayInsertion = System.nanoTime();
-            long durationSplayInsertion = endTimeSplayInsertion - startTimeSplayInsertion;
-            System.out.println("Time taken for Splay insertion operation " + i + ": " + durationSplayInsertion + " nanoseconds");
+            long durationSplayInsertion = (endTimeSplayInsertion - startTimeSplayInsertion) / 1000000; // Convert nanoseconds to milliseconds
+            System.out.println("Time taken for Splay insertion operation " + i + ": " + durationSplayInsertion + " milliseconds");
 
             long startTimeSplayDeletion = System.nanoTime();
             // Deletion operation on Splay tree
             long endTimeSplayDeletion = System.nanoTime();
-            long durationSplayDeletion = endTimeSplayDeletion - startTimeSplayDeletion;
-            System.out.println("Time taken for Splay deletion operation " + i + ": " + durationSplayDeletion + " nanoseconds");
+            long durationSplayDeletion = (endTimeSplayDeletion - startTimeSplayDeletion) / 1000000; // Convert nanoseconds to milliseconds
+            System.out.println("Time taken for Splay deletion operation " + i + ": " + durationSplayDeletion + " milliseconds");
         }
     }
 }

@@ -45,6 +45,70 @@ public class Wordle {
         System.out.println("Number of bits required for Huffman coding: " + huffmanBits);
         System.out.println("Compression ratio: " + compressionRatio);
 
+        findLongestShortestHuffmanCodes(dictionary);
+
+    }
+    public void findLongestShortestHuffmanCodes(List<String> wordList) {
+        HeapPriorityQueue<Integer, LinkedBinaryTree> myQueue = new HeapPriorityQueue<>();
+
+        HashMap<Character, Integer> freqMap = new HashMap<>();
+        for (String word : wordList) {
+            for (int i = 0; i < word.length(); i++) {
+                Character c = word.charAt(i);
+                freqMap.put(c, freqMap.getOrDefault(c, 0) + 1);
+            }
+        }
+
+        for (Map.Entry<Character, Integer> entry : freqMap.entrySet()) {
+            LinkedBinaryTree<Character> leafTree = new LinkedBinaryTree<>();
+            leafTree.addRoot(entry.getKey());
+            myQueue.insert(entry.getValue(), leafTree);
+        }
+
+        while (myQueue.size() > 1) {
+            Entry<Integer, LinkedBinaryTree> tree1 = myQueue.removeMin();
+            Entry<Integer, LinkedBinaryTree> tree2 = myQueue.removeMin();
+
+            Integer combinedFreq = tree1.getKey() + tree2.getKey();
+            LinkedBinaryTree<Character> leftChild = tree1.getValue();
+            LinkedBinaryTree<Character> rightChild = tree2.getValue();
+
+            LinkedBinaryTree<Character> parentNode = new LinkedBinaryTree<>();
+            parentNode.addRoot(null);
+            parentNode.attach(parentNode.root(), leftChild, rightChild);
+
+            myQueue.insert(combinedFreq, parentNode);
+        }
+        Entry<Integer, LinkedBinaryTree> rootEntry = myQueue.removeMin();
+        LinkedBinaryTree<Character> huffmanTree = rootEntry.getValue();
+
+        // Find the longest and shortest codes
+        String longestCodeWord = "";
+        String shortestCodeWord = "";
+        int longestCodeLength = 0;
+        int shortestCodeLength = Integer.MAX_VALUE;
+
+        for (String word : wordList) {
+            int totalCodeLength = 0;
+            for (char c : word.toCharArray()) {
+                totalCodeLength += getHuffmanBitLength(huffmanTree, c);
+            }
+            if (totalCodeLength > longestCodeLength) {
+                longestCodeLength = totalCodeLength;
+                longestCodeWord = word;
+            }
+            if (totalCodeLength < shortestCodeLength) {
+                shortestCodeLength = totalCodeLength;
+                shortestCodeWord = word;
+            }
+        }
+
+
+
+        System.out.println("Word with the longest Huffman code: " + longestCodeWord);
+        System.out.println("Longest Huffman code length: " + longestCodeLength);
+        System.out.println("Word with the shortest Huffman code: " + shortestCodeWord);
+        System.out.println("Shortest Huffman code length: " + shortestCodeLength);
     }
 
     public int calculateAsciiBits(List<String> wordList) {
