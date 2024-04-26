@@ -1,5 +1,9 @@
 package wordle;
 
+import project20280.interfaces.Entry;
+import project20280.priorityqueue.HeapPriorityQueue;
+import project20280.tree.LinkedBinaryTree;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,13 +28,136 @@ public class Wordle {
     public static final String ANSI_GREY_BACKGROUND = "\u001B[100m";
 
     Wordle() {
+        Map<String, String> huffmanTree = null;
 
         this.dictionary = readDictionary(fileName);
 
         System.out.println("dict length: " + this.dictionary.size());
         System.out.println("dict: " + dictionary);
 
+        buildHuffmanTree(dictionary);
+
+        int asciiBits = calculateAsciiBits(dictionary);
+        int huffmanBits = calculateHuffmanBits(dictionary);
+        double compressionRatio = (double) huffmanBits / asciiBits;
+
+        System.out.println("Number of bits required for ASCII coding: " + asciiBits);
+        System.out.println("Number of bits required for Huffman coding: " + huffmanBits);
+        System.out.println("Compression ratio: " + compressionRatio);
+
     }
+
+    public int calculateAsciiBits(List<String> wordList) {
+        int totalBits = 0;
+        for (String word : wordList) {
+            totalBits += word.length() * 8; // Assuming 8 bits per character for ASCII
+        }
+        return totalBits;
+    }
+    public int calculateHuffmanBits(List<String> wordList) {
+        HeapPriorityQueue<Integer, LinkedBinaryTree> myQueue = new HeapPriorityQueue<>();
+
+        HashMap<Character, Integer> freqMap = new HashMap<>();
+        for (String word : wordList) {
+            for (int i = 0; i < word.length(); i++) {
+                Character c = word.charAt(i);
+                freqMap.put(c, freqMap.getOrDefault(c, 0) + 1);
+            }
+        }
+
+        for (Map.Entry<Character, Integer> entry : freqMap.entrySet()) {
+            LinkedBinaryTree<Character> leafTree = new LinkedBinaryTree<>();
+            leafTree.addRoot(entry.getKey());
+            myQueue.insert(entry.getValue(), leafTree);
+        }
+
+        while (myQueue.size() > 1) {
+            Entry<Integer, LinkedBinaryTree> tree1 = myQueue.removeMin();
+            Entry<Integer, LinkedBinaryTree> tree2 = myQueue.removeMin();
+
+            Integer combinedFreq = tree1.getKey() + tree2.getKey();
+            LinkedBinaryTree<Character> leftChild = tree1.getValue();
+            LinkedBinaryTree<Character> rightChild = tree2.getValue();
+
+            LinkedBinaryTree<Character> parentNode = new LinkedBinaryTree<>();
+            parentNode.addRoot(null);
+            parentNode.attach(parentNode.root(), leftChild, rightChild);
+
+            myQueue.insert(combinedFreq, parentNode);
+        }
+        Entry<Integer, LinkedBinaryTree> rootEntry = myQueue.removeMin();
+        LinkedBinaryTree<Character> huffmanTree = rootEntry.getValue();
+
+        int totalBits = 0;
+        for (String word : wordList) {
+            for (int i = 0; i < word.length(); i++) {
+                Character c = word.charAt(i);
+                totalBits += getHuffmanBitLength(huffmanTree, c);
+            }
+        }
+        return totalBits;
+    }
+
+    public int getHuffmanBitLength(LinkedBinaryTree<Character> huffmanTree, char c) {
+        if (huffmanTree == null || huffmanTree.root() == null) {
+            return -1; // Invalid input or empty tree
+        }
+        // Assuming getNode() is a method that returns the Node for a given Position
+        LinkedBinaryTree.Node<Character> rootNode = huffmanTree.getNode(huffmanTree.root());
+        return findBitLength(huffmanTree, rootNode, c, 0);
+    }
+
+    private int findBitLength(LinkedBinaryTree<Character> huffmanTree, LinkedBinaryTree.Node<Character> node, char c, int depth) {
+        if (node == null) {
+            return -1; // Character not found
+        }
+        if (node.getLeft() == null && node.getRight() == null && node.getElement() == c) {
+            return depth;
+        }
+        int leftDepth = findBitLength(huffmanTree, node.getLeft(), c, depth + 1);
+        if (leftDepth != -1) {
+            return leftDepth;
+        }
+        return findBitLength(huffmanTree, node.getRight(), c, depth + 1);
+    }
+
+
+    public void buildHuffmanTree(List<String> wordList) {
+        HeapPriorityQueue<Integer, LinkedBinaryTree> myQueue = new HeapPriorityQueue<>();
+
+        HashMap<Character, Integer> freqMap = new HashMap<>();
+        for (String word : wordList) {
+            for (int i = 0; i < word.length(); i++) {
+                Character c = word.charAt(i);
+                freqMap.put(c, freqMap.getOrDefault(c, 0) + 1);
+            }
+        }
+
+        for (Map.Entry<Character, Integer> entry : freqMap.entrySet()) {
+            LinkedBinaryTree<Character> leafTree = new LinkedBinaryTree<>();
+            leafTree.addRoot(entry.getKey());
+            myQueue.insert(entry.getValue(), leafTree);
+        }
+
+        while (myQueue.size() > 1) {
+            Entry<Integer, LinkedBinaryTree> tree1 = myQueue.removeMin();
+            Entry<Integer, LinkedBinaryTree> tree2 = myQueue.removeMin();
+
+            Integer combinedFreq = tree1.getKey() + tree2.getKey();
+            LinkedBinaryTree<Character> leftChild = tree1.getValue();
+            LinkedBinaryTree<Character> rightChild = tree2.getValue();
+
+            LinkedBinaryTree<Character> parentNode = new LinkedBinaryTree<>();
+            parentNode.addRoot(null);
+            parentNode.attach(parentNode.root(), leftChild, rightChild);
+
+            myQueue.insert(combinedFreq, parentNode);
+        }
+        Entry<Integer, LinkedBinaryTree> rootEntry = myQueue.removeMin();
+        LinkedBinaryTree<Character> huffmanTree = rootEntry.getValue();
+        System.out.println("Huffman Tree: " + huffmanTree.toBinaryTreeString());
+    }
+
 
     public static void main(String[] args) {
         Wordle game = new Wordle();
@@ -59,30 +186,33 @@ public class Wordle {
             String [] hint = {"_", "_", "_", "_", "_"};
 
             for (int k = 0; k < 5; k++) {
-                // TODO:
+                if(guess.charAt(k) == target.charAt(k)) {
+                    hint[k] = "+"; // green
+                }
             }
-
-            // set the arrays for yellow (present but not in right place), grey (not present)
-            // loop over each entry:
-            //  if hint == "+" (green) skip it
-            //  else check if the letter is present in the target word. If yes, set to "o" (yellow)
             for (int k = 0; k < 5; k++) {
-                // TODO:
-
+                if(hint[k] == "_") {
+                    if(target.contains(String.valueOf(guess.charAt(k)))) {
+                        hint[k] = "o"; // yellow
+                    } else {
+                        hint[k] = "-"; // grey
+                    }
+                }
             }
 
             // after setting the yellow and green positions, the remaining hint positions must be "not present" or "_"
             System.out.println("hint: " + Arrays.toString(hint));
 
-
             // check for a win
             int num_green = 0;
             for(int k = 0; k < 5; ++k) {
-                if(hint[k] == "+") num_green += 1;
+                if(hint[k] == "+") {
+                    num_green += 1;
+                }
             }
             if(num_green == 5) {
-                 win(target);
-                 return;
+                win(target);
+                return;
             }
         }
 

@@ -2,6 +2,7 @@ package project20280.utils;
 
 import project20280.interfaces.Entry;
 
+
 public class MapEntry<K extends Comparable<K>, V> implements Entry<K, V> {
     private K k; // key
     private V v; // value

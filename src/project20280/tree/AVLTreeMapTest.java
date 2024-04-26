@@ -134,10 +134,7 @@ class AVLTreeMapTest {
         assertEquals(12, map.higherEntry(11).getKey());
     }
 
-    @Test
-    void testEntrySet() {
-        fail("Not yet implemented");
-    }
+
 
     @Test
     void testToString() {

@@ -17,5 +17,7 @@ public interface Entry<K, V> {
      * @return the entry's value
      */
     V getValue();
+
+    int compareTo(Entry<K, V> o);
 }
 

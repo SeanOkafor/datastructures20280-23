@@ -28,6 +28,19 @@ public class SplayTreeMap<K, V> extends TreeMap<K, V> {
      */
     private void splay(Position<Entry<K, V>> p) {
         // TODO
+        while (!isRoot(p)) {
+            Position<Entry<K,V>> parent = parent(p);
+            Position<Entry<K,V>> grand = parent(parent);
+            if (grand == null) // zig case
+                rotate(p);
+            else if ((parent == left(grand)) == (p == left(parent))) { // zig-zig case
+                rotate(parent); // move PARENT upward
+                rotate(p); // then move p upward
+            } else { // zig-zag case
+                rotate(p); // move p upward
+                rotate(p); // move p upward again
+            }
+        }
     }
 
     /**
@@ -38,6 +51,8 @@ public class SplayTreeMap<K, V> extends TreeMap<K, V> {
     //@Override
     protected void rebalanceAccess(Position<Entry<K, V>> p) {
         // TODO
+        if (isExternal(p)) p = parent(p);
+        if (p != null) splay(p);
     }
 
     /**
@@ -59,6 +74,7 @@ public class SplayTreeMap<K, V> extends TreeMap<K, V> {
     //@Override
     protected void rebalanceDelete(Position<Entry<K, V>> p) {
         // TODO
+        if (!isRoot(p)) splay(parent(p));
     }
 
     public static void main(String[] args) {

@@ -11,40 +11,85 @@ import project20280.interfaces.Queue;
  */
 
 public class LinkedCircularQueue<E> implements Queue<E> {
+    private Node<E> tail = null;
+    private int size = 0;
+
+    private static class Node<E> {
+        private E element;
+        private Node<E> next;
+
+        public Node(E e, Node<E> n) {
+            element = e;
+            next = n;
+        }
+
+        public E getElement() {
+            return element;
+        }
+
+        public Node<E> getNext() {
+            return next;
+        }
+
+        public void setNext(Node<E> n) {
+            next = n;
+        }
+    }
 
     public static void main(String[] args) {
-        // TODO Auto-generated method stub
-
+        LinkedCircularQueue<Integer> queue = new LinkedCircularQueue<>();
+        queue.enqueue(1);
+        queue.enqueue(2);
+        queue.enqueue(3);
+        System.out.println(queue.first());  // prints: 1
+        System.out.println(queue.dequeue());  // prints: 1
+        System.out.println(queue.first());  // prints: 2
     }
 
     @Override
     public int size() {
-        // TODO Auto-generated method stub
-        return 0;
+        return size;
     }
 
     @Override
     public boolean isEmpty() {
-        // TODO Auto-generated method stub
-        return false;
+        return size == 0;
     }
 
     @Override
     public void enqueue(E e) {
-        // TODO Auto-generated method stub
-
+        if (size == 0) {
+            tail = new Node<>(e, null);
+            tail.setNext(tail);  // circularly link to itself
+        } else {
+            Node<E> newest = new Node<>(e, tail.getNext());
+            tail.setNext(newest);
+            tail = newest;
+        }
+        size++;
     }
 
     @Override
     public E first() {
-        // TODO Auto-generated method stub
-        return null;
+        if (isEmpty()) {
+            return null;
+        }
+        return tail.getNext().getElement();
     }
 
     @Override
     public E dequeue() {
-        // TODO Auto-generated method stub
-        return null;
+        if (isEmpty()) {
+            return null;
+        }
+        Node<E> head = tail.getNext();
+        if (head == tail) {
+            tail = null;  // must be the only node left
+        } else {
+            tail.setNext(head.getNext());
+        }
+        size--;
+        return head.getElement();
     }
-
 }
+

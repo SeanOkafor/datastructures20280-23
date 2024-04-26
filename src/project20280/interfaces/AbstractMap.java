@@ -1,5 +1,5 @@
 package project20280.interfaces;
-
+import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -29,7 +29,7 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
      * A concrete implementation of the Entry interface to be used within a Map
      * implementation.
      */
-    protected static class MapEntry<K, V> implements Entry<K, V> {
+    public static class MapEntry<K, V> implements Entry<K, V>, Comparable<MapEntry<K, V>> {
         private K k; // key
         private V v; // value
 
@@ -47,6 +47,11 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
             return v;
         }
 
+        @Override
+        public int compareTo(Entry<K, V> o) {
+            return ((Comparable<K>) this.getKey()).compareTo(o.getKey());
+        }
+
         // utilities not exposed as part of the Entry interface
         protected void setKey(K key) {
             k = key;
@@ -56,6 +61,11 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
             V old = v;
             v = value;
             return old;
+        }
+
+        @Override
+        public int compareTo(MapEntry<K, V> o) {
+            return ((Comparable<K>) this.getKey()).compareTo(o.getKey());
         }
 
         /**
@@ -102,7 +112,12 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
      */
     @Override
     public Iterable<K> keySet() {
-        return new KeyIterable();
+        ArrayList<K>keys = new ArrayList<>();
+        for (Entry<K,V>e:entrySet()
+        ) {keys.add(e.getKey());
+
+        }
+        return keys;
     }
 
     // ---------------- nested ValueIterator class ----------------
