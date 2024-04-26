@@ -1,7 +1,7 @@
 package project20280.stacksqueues;
 
 public class ArrayBoundStack<E> extends ArrayStack<E> {
-    private static final int MAX_CAPACITY = 5;
+    private static final int MAX_CAPACITY = 10;
     public ArrayBoundStack() {
         super(MAX_CAPACITY);
     }
